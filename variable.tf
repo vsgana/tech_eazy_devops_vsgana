@@ -17,3 +17,8 @@ variable "stage" {
   description = "Deployment stage"
   type        = string
 }
+
+variable "bucket_name" {
+  type        = string
+  description = "Name of the S3 bucket to store logs"
+}
