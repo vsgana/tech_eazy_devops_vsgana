@@ -48,6 +48,40 @@ resource "local_file" "TF_key" {
   content  = tls_private_key.rsa.private_key_openssh
   filename = "devops1"
 }
+resource "aws_s3_bucket" "logs" {
+  bucket = var.bucket_name
+}
+
+resource "aws_s3_bucket_ownership_controls" "logs" {
+  bucket = aws_s3_bucket.logs.id
+
+  rule {
+    object_ownership = "BucketOwnerEnforced"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "logs" {
+  bucket = aws_s3_bucket.logs.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "logs" {
+  bucket = aws_s3_bucket.logs.id
+
+  rule {
+    id     = "expire-logs"
+    status = "Enabled"
+
+    expiration {
+      days = 7
+    }
+    filter {}
+  }
+}
 
 resource "aws_instance" "aws_dev" {
   ami = var.ami_id
@@ -57,9 +91,13 @@ resource "aws_instance" "aws_dev" {
      aws_s3_bucket.logs
   ]
   key_name = aws_key_pair.TF_key.key_name
+  iam_instance_profile =aws_iam_instance_profile.ec2_profile.name
   tags = {
      Name = "web-${var.stage}"
      Stage = var.stage
   }
-  user_data = file("script.sh")
+  user_data = templatefile("${path.module}/scripts/scripts.sh", {
+  bucket_name =var.bucket_name
+})
+
   }
