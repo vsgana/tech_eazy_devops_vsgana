@@ -174,6 +174,6 @@ jobs:
           echo "❌ App is not reachable on port 80 after multiple attempts"
           exit 1
 ```
-
+![githubworkflow](images/Screenshot 2025-07-11 212349.png)
 
 
