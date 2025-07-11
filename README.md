@@ -82,7 +82,7 @@ Add these in **GitHub > Settings > Secrets and Variables > Actions**:
 └── scripts/
       └── scripts.sh
       └── reader.sh
-
+```
 
 
 
