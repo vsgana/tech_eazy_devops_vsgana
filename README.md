@@ -1,79 +1,89 @@
-⚙️ Terraform Workflow
+# EC2 Deployment with GitHub Actions and Terraform
 
-This section outlines how to provision infrastructure on AWS using Terraform with support for multiple environments via workspaces and .tfvars files.
+This project automates the provisioning of AWS infrastructure using **Terraform**, triggered via **GitHub Actions**.
 
-📌 Prerequisites
+## 📦 Features
 
-Terraform installed (terraform -v)
+- Provision EC2 instances (`writer` and `reader`)
+- Attach IAM instance profiles
+- Store logs in an S3 bucket
+- Auto-generate key pairs for SSH access
+- Deploy app scripts using `user_data`
+- Health check on Port 80 after deployment
+- Triggered on:
+  - Push to `main`
+  - Tags `deploy-dev` or `deploy-prod`
+  - Manual trigger via **GitHub Actions UI**
 
-AWS CLI configured (aws configure)
+---
 
-AWS access keys with EC2 permission
+## 🚀 Deployment Flow
 
-Valid EC2 AMI ID and key pair (e.g. from Mumbai region)
+1. GitHub Action runs on:
+   - Push to `main`
+   - Push tag like `deploy-dev` or `deploy-prod`
+   - Manual trigger via **workflow_dispatch**
 
-📁 Terraform Files
-```bash
-terraform/
+2. Terraform:
+   - Initializes the project
+   - Applies infrastructure using `${stage}.tfvars`
+   - Provisions two EC2 instances
+   - Creates S3 bucket with lifecycle rules
+   - Writes logs to S3
+   - Generates dynamic SSH key pairs
+
+3. Health check:
+   - Polls the writer EC2 public IP
+   - Verifies port 80 returns HTTP `200` (OK)
+
+---
+
+## 🛠 Manual Trigger Instructions
+
+You can manually deploy using GitHub’s UI:
+
+1. Go to **Actions → Deploy EC2 with Terraform**
+2. Click **"Run workflow"**
+3. Choose the environment:
+   - `dev`
+   - `prod`
+
+---
+
+## 🧪 Variables
+
+Terraform uses different variable files depending on the stage:
+
+- `dev.tfvars`
+- `prod.tfvars`
+
+
+---
+
+## 🔐 Secrets Used
+
+Add these in **GitHub > Settings > Secrets and Variables > Actions**:
+
+| Secret Name             | Description              |
+|-------------------------|--------------------------|
+| `AWS_ACCESS_KEY_ID`     | Your AWS access key ID   |
+| `AWS_SECRET_ACCESS_KEY` | Your AWS secret key      |
+
+---
+
+.
+├── .github/workflows/
+│   └── deploy.yml
 ├── main.tf
-├── variable.tf
+├── output.tf
+├── iam.tf
 ├── dev.tfvars
 ├── prod.tfvars
-├── output.tfvars
-├── script.sh
-```
-🛠️ Step-by-Step Terraform Flow
+└── scripts/
+      └── scripts.sh
+      └── reader.sh
 
-✅ 1. Initialize Terraform
 
-```bash
-cd terraform/
-terraform init
-```
-✅ 2. Create & Select Workspace (Dev or Prod)
-```bash
-# Create workspace
-terraform workspace new dev
 
-# OR switch to existing
-terraform workspace select dev
-```
-To list workspaces:
-```bash
-terraform workspace list
-```
-✅ 3. Plan Infrastructure
-```bash
-terraform plan -var-file="dev.tfvars"
-```
-For production:
-```
-terraform workspace select prod
-terraform plan -var-file="prod.tfvars"
-```
-✅ 4. Apply Infrastructure
-```bash
-terraform apply -auto-approve -var-file="dev.tfvars"
-```
-✅ 5. (Optional) Destroy Infrastructure
-```
-terraform destroy -auto-approve -var-file="dev.tfvars"
 
-🛠️ Build & Deploy Spring Boot App
-```bash
-# Install Java & Maven if not done
-sudo apt update && sudo apt install -y openjdk-21-jdk maven
 
-# Clone your repo
-git clone https://github.com/<your-username>/<repo-name>.git
-cd repo-name/spring-boot-app
-
-# Build the application
-mvn clean install
-
-# Run the JAR
-sudo java -jar target/techeazy-devops-0.0.1-SNAPSHOT.jar
-```
-The app will run at: http://13.234.34.93:80/
-
-![Deployment](images/deployment.png)
