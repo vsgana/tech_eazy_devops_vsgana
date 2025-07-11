@@ -83,8 +83,6 @@ Add these in **GitHub > Settings > Secrets and Variables > Actions**:
       └── scripts.sh
       └── reader.sh
 
-```bash
-
 
 
 
