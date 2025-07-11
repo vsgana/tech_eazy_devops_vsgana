@@ -70,7 +70,7 @@ Add these in **GitHub > Settings > Secrets and Variables > Actions**:
 | `AWS_SECRET_ACCESS_KEY` | Your AWS secret key      |
 
 ---
-
+```bash
 .
 ├── .github/workflows/
 │   └── deploy.yml
@@ -82,6 +82,8 @@ Add these in **GitHub > Settings > Secrets and Variables > Actions**:
 └── scripts/
       └── scripts.sh
       └── reader.sh
+
+```bash
 
 
 
