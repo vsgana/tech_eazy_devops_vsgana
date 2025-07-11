@@ -73,7 +73,7 @@ Add these in **GitHub > Settings > Secrets and Variables > Actions**:
 ```bash
 .
 ├── .github/workflows/
-│   └── deploy.yml
+│   └── ass3.yml
 ├── main.tf
 ├── output.tf
 ├── iam.tf
@@ -90,7 +90,7 @@ name: Deploy EC2 with Terraform
 
 on:
   push:
-    branches: [main]
+    branches: [automation2]
     tags:
       - deploy-dev
       - deploy-prod
